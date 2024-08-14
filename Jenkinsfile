@@ -1,12 +1,14 @@
 pipeline {
     agent any
-    triggers {
-        githubPush()
-    }
+    //triggers {
+        //githubPush()
+    //}
     environment {
         SONAR_ORG = 'abdulp07-git'
-        SONAR_PROJECT_KEY = 'abdulp07-git_jenkins-week9'
+        SONAR_PROJECT_KEY = 'abdulp07-git_jenkins_week10'
         SONAR_TOKEN = credentials('SonarCloudToken')  // Retrieves the token stored as Jenkins credential
+    	DOCKERHUB_USER = credentials('dockerhub-username')
+        DOCKERHUB_PASS = credentials('dockerhub-password')
     }
 
     stages {
@@ -52,11 +54,44 @@ pipeline {
                 archiveArtifacts artifacts: '**/target/*.war', allowEmptyArchive: true
             }
         }
-        stage("Deploy") {
+
+
+	
+	stage("Build docker image"){
             steps {
-                deploy adapters: [tomcat9(credentialsId: 'Tomcat_deployer', path: '', url: 'http://abdjenkins.com:8081/manager/html')], contextPath: 'Web application', war: '**/*.war'
+                script {
+                    def dockerImage = "abdulp07/tomcat_pro"
+                    def tag = "v${BUILD_NUMBER}"
+                    def fullImageName = "${dockerImage}:${tag}"
+                    sh "docker build -t ${fullImageName} ."
+                }
             }
         }
-    }
-}
+        
+        
+        stage("Push Docker Image to Docker Hub"){
+            steps {
+                script {
+                     def dockerImage = "abdulp07/tomcat_pro"
+                     def tag = "v${BUILD_NUMBER}"
+                     def fullImageName = "${dockerImage}:${tag}"
+                    
+                    
+                    sh '''
+                    #!/bin/bash
+                    
+         echo $DOCKERHUB_PASS | docker login -u $DOCKERHUB_USER --password-stdin
+                    '''
 
+                    sh "docker push ${fullImageName}"
+                }
+            }
+        }
+
+
+
+
+
+    
+   }
+}
