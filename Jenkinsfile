@@ -14,7 +14,7 @@ pipeline {
     stages {
         stage('CheckOut') {
             steps {
-                git 'https://github.com/abdulp07-git/jenkins-week9.git'
+                git 'https://github.com/abdulp07-git/jenkins_week10.git'
             }
         }
         stage('Unit Test') {  // New stage for unit testing
