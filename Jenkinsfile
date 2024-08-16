@@ -1,8 +1,8 @@
 pipeline {
     agent any
-    //triggers {
-        //githubPush()
-    //}
+    triggers {
+        githubPush()
+    }
     environment {
         SONAR_ORG = 'abdulp07-git'
         SONAR_PROJECT_KEY = 'abdulp07-git_jenkins_week10'
