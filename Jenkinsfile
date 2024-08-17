@@ -86,7 +86,14 @@ pipeline {
                     sh "docker push ${fullImageName}"
                 }
             }
-        }
+        
+	
+	    post {
+                always {
+                    sh 'docker logout'
+                }
+            }
+	}
 
 
 
